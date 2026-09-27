@@ -81,9 +81,13 @@ make up
 
 `make up` starts Compose in detached mode, runs the camera adapter natively with macOS camera permission through `uv run`, follows the container logs, and stops both lifecycles on `Ctrl+C`. `make dev` is an alias for the same flow.
 
-For camera-only debugging, keep the Docker core running and use `make camera-mac` in another terminal:
+For two-terminal debugging, run the Docker core directly and the native camera separately:
 
 ```bash
+# terminal 1
+docker compose up --build
+
+# terminal 2
 make camera-mac
 ```
 
