@@ -15,8 +15,6 @@ class Settings(BaseSettings):
     CAMERA_FPS: int = 15
     MODEL_NAME: str = "yolo11n.pt"
     PREDICTION_EVERY_N_FRAMES: int = 5
-    SPEAKER_DEVICE: str = "plughw:CARD=Device,DEV=0"
-    SPEAKER_ENABLED: bool = True
 
 
 settings = Settings()

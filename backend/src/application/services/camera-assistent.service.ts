@@ -1,17 +1,11 @@
 import { CameraAgentPort } from "../ports/camera-agent.port.js";
-import { SpeakerRestAdapterPort } from "../../infrastructure/ports/speaker-rest-adapter.port.js";
 import { UnknownAgentError } from "../errors/unknown-agent.error.js";
 
 export class CameraAssistent {
-    _speakerRestAdapter: SpeakerRestAdapterPort;
     _cameraAgent: CameraAgentPort;
     _agentMap: Record<string, CameraAgentPort>;
 
-    constructor(
-        speakerRestAdapter: SpeakerRestAdapterPort,
-        cameraAgent: CameraAgentPort
-    ) {
-        this._speakerRestAdapter = speakerRestAdapter;
+    constructor(cameraAgent: CameraAgentPort) {
         this._cameraAgent = cameraAgent;
         this._agentMap = {
             "camera-agent": this._cameraAgent,
@@ -23,15 +17,6 @@ export class CameraAssistent {
             return this._agentMap[agent].invokeAgent(question);
         } else {
             throw new UnknownAgentError(`Agent ${agent} does not exist!`);
-        }
-    }
-
-    async speak(text: string): Promise<Boolean> {
-        try {
-            await this._speakerRestAdapter.speak(text);
-            return true
-        } catch (error) {
-            return false
         }
     }
 

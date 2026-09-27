@@ -7,9 +7,6 @@ COMPOSE := docker compose -f docker-compose.yml
 .PHONY: up dev up-hardware camera-mac down logs check check-backend check-frontend check-python check-exclusions check-readme
 
 up:
-	$(COMPOSE) up --build
-
-dev:
 	@set -eu; \
 	camera_pid=""; logs_pid=""; \
 	cleanup() { \
@@ -21,12 +18,14 @@ dev:
 		$(COMPOSE) down; \
 	}; \
 	trap cleanup EXIT INT TERM; \
-	$(COMPOSE) up --build -d; \
+	$(COMPOSE) up --build -d --wait --wait-timeout 120; \
 	(cd vision && uv sync --frozen && exec env WS_SERVER_URL=ws://localhost:8080 REDIS_HOST=localhost REDIS_PORT=6379 uv run python -m src.application.servers.camera_streamer.streamer) & \
 	camera_pid=$$!; \
 	$(COMPOSE) logs -f & \
 	logs_pid=$$!; \
 	wait "$$camera_pid"
+
+dev: up
 
 up-hardware:
 	docker compose -f docker-compose.yml -f docker-compose.hardware.yml --profile linux-camera up --build
@@ -52,6 +51,7 @@ check-backend:
 
 check-frontend:
 	$(NPM) --prefix frontend install
+	$(NPM) --prefix frontend test
 	$(NPM) --prefix frontend run lint
 	$(NPM) --prefix frontend run build
 
@@ -74,7 +74,7 @@ check-readme:
 	@rg -q "make dev" README.md
 	@rg -q "http://localhost:5173" README.md
 	@rg -q "http://localhost:8000/mcp" README.md
-	@rg -q "/api/speak" README.md
+	@rg -q "speechSynthesis" README.md
 	@rg -q "Docker Desktop" README.md
 	@rg -q "make camera-mac" README.md
 	@rg -q "uv sync --frozen" vision/README.md

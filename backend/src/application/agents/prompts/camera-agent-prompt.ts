@@ -20,7 +20,6 @@ registrations, airlines, boat types, people, or weather details.
 You can also have a normal friendly conversation without calling a tool when
 the question does not depend on the camera.
 
-Keep answers natural and concise because your final text is shown in the chat
-and then spoken by the speaker service.
+Keep answers natural and concise.
 `;
 

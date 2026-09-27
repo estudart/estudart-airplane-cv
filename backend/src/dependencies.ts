@@ -5,12 +5,9 @@ import { CameraAgent } from "./application/agents/camera-agent.js";
 import { CAMERA_AGENT_SYSTEM_PROMPT } from "./application/agents/prompts/camera-agent-prompt.js"
 import { CameraAssistent } from "./application/services/camera-assistent.service.js";
 import { WebSocketService } from "./application/services/wss-handler.service.js";
-import { SpeakerRestAdapter } from "./infrastructure/speaker-rest-adapter.js";
 
 const CAMERA_AGENT_TOOLS = ["capture_image", "get_latest_frame_info", "mcp_status"];
 const mcpServerUrl = process.env.MCP_SERVER_URL ?? "http://localhost:8000"
-
-const speakerRestAdapter = new SpeakerRestAdapter(`${mcpServerUrl}/api`);
 
 const MCPUrl = `${mcpServerUrl}/mcp`
 const client = await getClient(MCPUrl);
@@ -27,7 +24,7 @@ const cameraAgent = new CameraAgent(
     pick(CAMERA_AGENT_TOOLS),
 )
 
-const cameraAssistent = new CameraAssistent(speakerRestAdapter, cameraAgent);
+const cameraAssistent = new CameraAssistent(cameraAgent);
 
 async function getClient(url: string) {
     const transport = new StreamableHTTPClientTransport(new URL(url));

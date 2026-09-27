@@ -52,7 +52,6 @@ export class WebSocketService {
                         response = await this._cameraAssistent.invoke(agent, question);
                         const responseMessage = this._cameraAssistent.responseText(response);
                         if (responseMessage !== undefined) {
-                            await this._cameraAssistent.speak(responseMessage);
                             ws.send(JSON.stringify({ type: "response", message: responseMessage, agent }))
                         }
                     };

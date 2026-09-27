@@ -1,6 +1,6 @@
 # estudart-airplane-cv
 
-Computer-vision study lab derived from `estudart-mcp-robot`. It preserves the original service boundaries, WebSocket chat, MCP adapter, conversational agent, camera flow, and REST speaker integration while removing the physical robot controls.
+Computer-vision study lab derived from `estudart-mcp-robot`. It preserves the original service boundaries, WebSocket chat, MCP adapter, conversational agent, camera flow, and browser speech output while removing the physical robot controls.
 
 ## Architecture
 
@@ -14,7 +14,10 @@ macOS webcam -> native camera-streamer --WebSocket--> backend -> CameraStream
               FastMCP camera tools <- CameraAgent response
                                                  |
                                                  v
-                                   REST POST /api/speak
+                              browser speechSynthesis
+                                      |
+                                      v
+                              Mac default speaker
 ```
 
 On Linux/Raspberry, the same camera-streamer can run in Docker through the hardware override. Only the adapter placement changes; the frame, Redis, MCP, backend, and frontend protocols stay the same.
@@ -43,7 +46,7 @@ The backend keeps the original application/infrastructure/presentation split. `C
 - `get_latest_frame_info`: reports frame availability and size.
 - `mcp_status`: reports the camera MCP service status.
 
-The speaker is intentionally not an MCP tool. After the agent answers, the backend sends that exact final chat message to the vision REST route `POST /api/speak`, matching the robot project flow.
+Speech is a frontend concern in this Mac MVP. When a new agent `response` arrives over WebSocket, `CameraChat` creates one `SpeechSynthesisUtterance` and the browser plays it through the Mac default speaker. The backend does not call a speaker REST endpoint.
 
 ## Configuration by service
 
@@ -66,27 +69,21 @@ CAMERA_HEIGHT=720
 CAMERA_FPS=15
 MODEL_NAME=yolo11n.pt
 PREDICTION_EVERY_N_FRAMES=5
-SPEAKER_DEVICE=plughw:CARD=Device,DEV=0
-SPEAKER_ENABLED=true
 ```
 
 ## Start on macOS
 
-Docker Desktop cannot expose the built-in webcam as `/dev/video0`. The normal development entry point manages the Docker services and native camera streamer together:
+Docker Desktop cannot expose the built-in webcam as `/dev/video0`. The normal entry point manages the Docker services and native camera streamer together:
 
 ```bash
-make dev
+make up
 ```
 
-`make dev` starts Compose in detached mode, runs the camera adapter natively with macOS camera permission, follows the container logs, and stops both lifecycles on `Ctrl+C`.
+`make up` starts Compose in detached mode, runs the camera adapter natively with macOS camera permission through `uv run`, follows the container logs, and stops both lifecycles on `Ctrl+C`. `make dev` is an alias for the same flow.
 
-For two-terminal debugging, `make up` runs only the Docker core in the foreground and `make camera-mac` runs only the native streamer:
+For camera-only debugging, keep the Docker core running and use `make camera-mac` in another terminal:
 
 ```bash
-# terminal 1
-make up
-
-# terminal 2
 make camera-mac
 ```
 
@@ -99,13 +96,13 @@ Open:
 - MCP endpoint: <http://localhost:8000/mcp>
 - Vision health: <http://localhost:8000/api/health>
 
-Ask “Describe what you see now.” The agent must call `capture_image`, answer in the chat, and send the same final answer to the speaker REST route.
+Ask “Describe what you see now.” The agent must call `capture_image`, answer in the chat, and the browser speaks that new response through the Mac default speaker.
 
-Stop the Docker services with `make down`. Stop the native camera streamer with `Ctrl+C`.
+Stop the complete `make up` flow with `Ctrl+C`. The cleanup stops both the native camera streamer and Docker services. `make down` remains available for a detached stack.
 
 ## Start on Linux/Raspberry
 
-The hardware target enables the camera container at `/dev/video0` and the MCP speaker at `/dev/snd`:
+The hardware target enables the camera container at `/dev/video0`:
 
 ```bash
 make up-hardware

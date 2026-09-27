@@ -2,12 +2,10 @@ import logging
 
 from src.application.services.camera_streamer import CameraStreamer
 from src.application.services.logging_service import LoggerService
-from src.application.services.speak_service import SpeakService
 from src.config import settings
 from src.infrastructure.camera_adapter import CameraAdapter
 from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
 from src.infrastructure.redis_adapter import RedisAdapter
-from src.infrastructure.speech_adapter import SpeechAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
 
 
@@ -17,8 +15,6 @@ _camera_streamer: CameraStreamer | None = None
 _image_predictor_adapter: ImagePredictorAdapter | None = None
 _logger_service: LoggerService | None = None
 _redis_adapter: RedisAdapter | None = None
-_speech_adapter: SpeechAdapter | None = None
-_speak_service: SpeakService | None = None
 
 
 def get_logger_service() -> LoggerService:
@@ -26,26 +22,6 @@ def get_logger_service() -> LoggerService:
     if not _logger_service:
         _logger_service = LoggerService(level=logging.INFO)
     return _logger_service
-
-
-def get_speech_adapter() -> SpeechAdapter:
-    global _speech_adapter
-    if not _speech_adapter:
-        _speech_adapter = SpeechAdapter(
-            device=settings.SPEAKER_DEVICE,
-            enabled=settings.SPEAKER_ENABLED,
-        )
-    return _speech_adapter
-
-
-def get_speak_service() -> SpeakService:
-    global _speak_service
-    if not _speak_service:
-        _speak_service = SpeakService(
-            logger_service=get_logger_service(),
-            speech_adapter=get_speech_adapter(),
-        )
-    return _speak_service
 
 
 def get_camera_adapter() -> CameraAdapter:

@@ -11,9 +11,6 @@ cameraAssistentRoutes.post('/camera-assistent', async (req: Request, res: Respon
             req.body.question,
         );
         const responseMessage = cameraAssistent.responseText(agentAnswer);
-        if (responseMessage) {
-            await cameraAssistent.speak(responseMessage);
-        }
         res.send(responseMessage ?? "");
     } catch (error) {
         res.status(400).send(String(error));

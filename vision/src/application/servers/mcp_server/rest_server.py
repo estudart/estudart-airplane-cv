@@ -5,7 +5,6 @@ from fastmcp.utilities.lifespan import combine_lifespans
 
 from src.application.servers.mcp_server.mcp_server import mcp
 from src.presentation.routes.health_route import health_router
-from src.presentation.routes.speak_routes import speak_router
 
 
 @asynccontextmanager
@@ -23,7 +22,6 @@ app = FastAPI(
 )
 
 app.include_router(health_router)
-app.include_router(speak_router)
 
 print("Starting MCP Server...")
 

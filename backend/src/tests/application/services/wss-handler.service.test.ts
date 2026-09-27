@@ -16,7 +16,6 @@ describe(WebSocketService.name, () => {
     let app: Application;
     let server: http.Server;
     let service: WebSocketService;
-    let spokenMessage = "";
 
     before(async () => {
         app = express();
@@ -26,15 +25,7 @@ describe(WebSocketService.name, () => {
                 return [{ type: "text", text: "CameraAgent: " + question }];
             },
         };
-        const speakerRestAdapter = {
-            async speak(text: string) {
-                spokenMessage = text;
-            },
-        };
-        const cameraAssistent = new CameraAssistent(
-            speakerRestAdapter,
-            cameraAgent,
-        );
+        const cameraAssistent = new CameraAssistent(cameraAgent);
         service = new WebSocketService(cameraAssistent);
 
         server.on("upgrade", (
@@ -78,7 +69,7 @@ describe(WebSocketService.name, () => {
         assert.equal(frame, "frame-b64");
     });
 
-    it("answers CameraAgent messages and sends the answer to speaker", async () => {
+    it("answers CameraAgent messages", async () => {
         const chat = new WebSocket("ws://localhost:" + port);
         await new Promise<void>((resolve) => chat.once("open", resolve));
 
@@ -92,7 +83,6 @@ describe(WebSocketService.name, () => {
 
         chat.close();
         assert.equal(answer, "CameraAgent: What do you see?");
-        assert.equal(spokenMessage, answer);
     });
 
     it("does not subscribe consumers without detected=true", async () => {

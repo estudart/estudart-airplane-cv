@@ -12,15 +12,12 @@ On macOS, `make camera-mac` runs the streamer natively so OpenCV can access the 
 FastAPI routes:
 
 - `GET /api/health`
-- `POST /api/speak?text=...`
 
 MCP tools:
 
 - `capture_image`
 - `get_latest_frame_info`
 - `mcp_status`
-
-The speaker remains a REST integration called by the backend after the agent produces its final message. It is not available to the agent as an MCP tool.
 
 ## uv workflow
 
