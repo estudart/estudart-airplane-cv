@@ -17,6 +17,8 @@ class CameraAdapter:
         self._fps = fps
         self._cap: cv.VideoCapture | None = None
 
+        self._get_capture()
+
     @staticmethod
     def parse_source(source: str):
         return int(source) if source.isdigit() else source
@@ -34,11 +36,16 @@ class CameraAdapter:
         return self._cap
 
     def get_frame(self):
-        capture = self._get_capture()
-        received, frame = capture.read()
+        received, frame = self._cap.read()
         if not received or frame is None:
             raise RuntimeError(f"Could not read camera source: {self._source}")
         return frame
+
+    def read_image(self, path: str):
+        return cv.imread(path)
+
+    def save_image(self, path, frame):
+        cv.imwrite(path, frame)
 
     def from_frame_to_b64(self, frame) -> str:
         encoded, buffer = cv.imencode(".jpg", frame)
