@@ -1,0 +1,255 @@
+.chatPage {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: clamp(260px, 32vh, 360px);
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.chatBox {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 0 0;
+  gap: 16px;
+}
+
+/* ---------------- sidebar ---------------- */
+
+.sideBar {
+  height: 100%;
+  flex: 0 0 clamp(132px, 22%, 220px);
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.sideBar::before {
+  content: 'Agents';
+  flex: none;
+  margin: 0 3px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #4a5369;
+}
+
+.sideBarOptions,
+.sideBarOptionsSelected {
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.35;
+  padding: 9px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  overflow-wrap: anywhere;
+  transition:
+    color 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.sideBarOptions {
+  color: var(--text-dim);
+}
+
+.sideBarOptions:hover {
+  color: var(--text-h);
+  background: var(--surface-3);
+}
+
+.sideBarOptionsSelected {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--accent-bg);
+  border-color: var(--accent-line);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* ---------------- messages panel ---------------- */
+
+.chatMessages {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.chatHistory {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 22px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+
+/* empty state */
+.chatHistory:empty::before {
+  content: 'No messages yet — ask the camera agent what it sees ✈️';
+  margin: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.4px;
+  color: #454e64;
+}
+
+.userMessageContainer {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.agentMessageContainer {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.userMessage,
+.agentMessage {
+  max-width: 76%;
+  padding: 10px 14px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.userMessage {
+  color: var(--accent-ink);
+  font-weight: 500;
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  border-radius: 14px 14px 4px 14px;
+  box-shadow: 0 6px 18px -8px rgba(0, 240, 255, 0.55);
+}
+
+.agentMessage {
+  color: var(--text-h);
+  background: var(--surface-3);
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 14px 4px;
+}
+
+/* ---------------- composer ---------------- */
+
+.chatText {
+  flex: none;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  gap: 10px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+
+.chatInputBox {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 16px;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  color: var(--text-h);
+  background: #0b0d13;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.chatInputBox::placeholder {
+  color: #4a5369;
+}
+
+.chatInputBox:focus {
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.chatButton {
+  flex: none;
+  height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  cursor: pointer;
+  transition:
+    filter 0.16s ease,
+    transform 0.12s ease,
+    box-shadow 0.16s ease;
+}
+
+.chatButton:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px -8px rgba(0, 240, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+.chatButton:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+@media (max-width: 560px) {
+  .chatBox {
+    padding: 10px;
+    gap: 10px;
+  }
+  .chatHistory {
+    padding: 14px;
+  }
+  .userMessage,
+  .agentMessage {
+    max-width: 88%;
+  }
+  .chatText {
+    padding: 10px;
+  }
+  .chatButton {
+    padding: 0 15px;
+  }
+}

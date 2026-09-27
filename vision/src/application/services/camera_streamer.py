@@ -1,0 +1,72 @@
+import asyncio
+
+from src.application.services.logging_service import LoggerService
+from src.config import settings
+from src.infrastructure.camera_adapter import CameraAdapter
+from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
+from src.infrastructure.redis_adapter import RedisAdapter
+from src.infrastructure.web_socket_adapter import WebSocketAdapter
+
+
+class CameraStreamer:
+    def __init__(
+        self,
+        logger_service: LoggerService,
+        redis_adapter: RedisAdapter,
+        camera_adapter: CameraAdapter,
+        web_socket_adapter: WebSocketAdapter,
+        image_predictor_adapter: ImagePredictorAdapter,
+        should_predict: bool,
+    ) -> None:
+        self._logger_service = logger_service
+        self._redis_adapter = redis_adapter
+        self._camera_adapter = camera_adapter
+        self._web_socket_adapter = web_socket_adapter
+        self._image_predictor_adapter = image_predictor_adapter
+        self._last_result = None
+        self._count_frame = 0
+        self._should_predict = should_predict
+
+    async def connect_stream(self):
+        await self._web_socket_adapter.connect()
+        self._logger_service.log_info_message("Connection established")
+
+    async def stream_frame(self):
+        await self.connect_stream()
+        await self._redis_adapter._create_connection()
+        frame_delay = 1 / max(settings.CAMERA_FPS, 1)
+
+        self._logger_service.log_info_message("Starting camera streaming...")
+
+        while True:
+            try:
+                frame = self._camera_adapter.get_frame()
+
+                if self._should_predict:
+                    if self._count_frame >= settings.PREDICTION_EVERY_N_FRAMES:
+                        self._last_result = self._image_predictor_adapter.predict_image(
+                            frame=frame
+                        )
+                        self._count_frame = 0
+
+                    if self._last_result:
+                        frame = self._last_result.plot(img=frame)
+
+                    self._count_frame += 1
+
+                await self._redis_adapter.set_key(
+                    key=settings.CAMERA_FRAME_KEY,
+                    value=self._camera_adapter.from_frame_to_bytes(frame),
+                )
+
+                await self._web_socket_adapter.send_message(
+                    msg_type="camera-frame",
+                    message=self._camera_adapter.from_frame_to_b64(frame),
+                )
+                await asyncio.sleep(frame_delay)
+            except Exception as err:
+                self._logger_service.log_error_message(
+                    f"Could not stream frame, reason: {err}"
+                )
+                await asyncio.sleep(5)
+

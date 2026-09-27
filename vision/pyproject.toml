@@ -1,0 +1,43 @@
+[project]
+name = "airplane-camera-vision"
+version = "0.1.0"
+description = "Camera streaming, object detection, Redis frame storage, and MCP image capture"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "fastmcp>=3.4.7",
+    "opencv-python-headless>=4.10.0",
+    "pydantic-settings>=2.10.0",
+    "redis>=6.0.0",
+    "torch==2.14.0",
+    "torchvision==0.29.0",
+    "ultralytics>=8.3.0",
+    "uvicorn>=0.34.0",
+    "websockets>=15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.26.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
+log_cli = true
+log_cli_level = "INFO"
+
+
+[tool.uv]
+exclude-dependencies = ["nvidia-ml-py"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }

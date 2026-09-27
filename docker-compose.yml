@@ -1,0 +1,102 @@
+services:
+  mcp-server:
+    build:
+      context: ./vision
+      dockerfile: src/application/servers/mcp_server/Dockerfile
+    container_name: airplane-mcp-server
+    restart: unless-stopped
+    env_file:
+      - path: ./vision/.env
+        required: false
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    environment:
+      - REDIS_HOST=redis-db
+      - REDIS_PORT=6379
+    depends_on:
+      redis-db:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: airplane-backend
+    restart: unless-stopped
+    env_file:
+      - path: ./backend/.env
+        required: false
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    environment:
+      - API_PORT=8080
+      - MCP_SERVER_URL=http://mcp-server:8000
+    depends_on:
+      mcp-server:
+        condition: service_healthy
+
+  camera-streamer:
+    profiles: ["linux-camera"]
+    build:
+      context: ./vision
+      dockerfile: src/application/servers/camera_streamer/Dockerfile
+    container_name: airplane-camera-streamer
+    restart: unless-stopped
+    env_file:
+      - path: ./vision/.env
+        required: false
+    environment:
+      - WS_SERVER_URL=ws://backend:8080
+      - SHOULD_PREDICT=true
+      - REDIS_HOST=redis-db
+      - REDIS_PORT=6379
+    depends_on:
+      backend:
+        condition: service_healthy
+      redis-db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-ws://localhost:8080}
+    container_name: airplane-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  redis-db:
+    image: redis:7-alpine
+    container_name: airplane-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  redis-data:
+    driver: local
+

@@ -1,0 +1,11 @@
+.venv
+__pycache__
+.pytest_cache
+.env
+*.jpg
+*.jpeg
+*.png
+*.pt
+*.onnx
+*.engine
+
