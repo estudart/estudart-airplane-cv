@@ -5,9 +5,16 @@ from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
 
 
 def test_can_count_object():
-    camera_adapter = CameraAdapter("airplane-right-to-left-fixed-camera.mp4")
-    video_writer = camera_adapter.get_writer("object_counting_output.avi")
-    image_predictor = ImagePredictorAdapter("yolo26n.pt")
+    camera_adapter = CameraAdapter(
+        "airplane-right-to-left-fixed-camera.mp4"
+    )
+    video_writer = camera_adapter.get_writer(
+        "object_counting_output.avi"
+    )
+    image_predictor = ImagePredictorAdapter(
+        "yolo26n.pt",
+        show=True
+    )
     
     while camera_adapter._cap.isOpened():
         success, im0 = camera_adapter._cap.read()

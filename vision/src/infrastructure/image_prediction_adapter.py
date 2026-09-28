@@ -3,19 +3,23 @@ from ultralytics import YOLO, solutions
 
 class ImagePredictorAdapter:
     def __init__(
-        self, 
+        self,
         model_name: str,
         width: int = 1280,
         height: int = 720,
+        show: bool = False,
+        classes: list = [4]
     ):
         self._model = YOLO(model_name)
         self._width = width
         self._height = height
         self._object_counter = solutions.ObjectCounter(
-            show=True,
+            show=show,
             region=[(600, 50), (600, 650)],
             model=self._model,
-            classes=[4],
+            classes=classes,
+            # classes=[0], # person
+            # classes=[4], # airplane
         )
 
     def count_objects(self, frame):
