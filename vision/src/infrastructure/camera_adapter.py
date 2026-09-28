@@ -17,13 +17,13 @@ class CameraAdapter:
         self._fps = fps
         self._cap: cv.VideoCapture | None = None
 
-        self._get_capture()
+        self._set_capture()
 
     @staticmethod
     def parse_source(source: str):
         return int(source) if source.isdigit() else source
 
-    def _get_capture(self) -> cv.VideoCapture:
+    def _set_capture(self) -> cv.VideoCapture:
         if self._cap is None:
             self._cap = cv.VideoCapture(self._source)
             self._cap.set(cv.CAP_PROP_FRAME_WIDTH, self._width)
@@ -32,8 +32,6 @@ class CameraAdapter:
 
         if not self._cap.isOpened():
             raise RuntimeError(f"Could not open camera source: {self._source}")
-
-        return self._cap
 
     def get_writer(self, path: str):
         return cv.VideoWriter(
