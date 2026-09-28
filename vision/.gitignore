@@ -11,6 +11,5 @@ __pycache__/
 *.onnx
 *.engine
 models/
-test_loop_yolo.py
 airplane-right-to-left-fixed-camera.mp4
 object_counting_output.avi

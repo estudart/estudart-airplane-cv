@@ -16,7 +16,6 @@ class CameraAdapter:
         self._height = height
         self._fps = fps
         self._cap: cv.VideoCapture | None = None
-        self._writer: cv.VideoWriter | None = None
 
         self._get_capture()
 
@@ -36,19 +35,13 @@ class CameraAdapter:
 
         return self._cap
 
-    def _get_writer(self):
-        if not self._writer:
-            w, h, fps = (
-                int(cap.get(x)) for x in (
-                    cv.CAP_PROP_FRAME_WIDTH,
-                    cv.CAP_PROP_FRAME_HEIGHT,
-                    cv.CAP_PROP_FPS)
-                )
-            self._writer = cv.VideoWriter(
-                "object_counting_output.avi",
-                cv.VideoWriter_fourcc(*"mp4v"), fps, (w, h)
-            )
-        return self._writer
+    def get_writer(self, path: str):
+        return cv.VideoWriter(
+            path,
+            cv.VideoWriter_fourcc(*"mp4v"),
+            self._fps,
+            (self._width, self._height)
+        )
 
     def get_frame(self):
         received, frame = self._cap.read()
@@ -78,4 +71,7 @@ class CameraAdapter:
         if self._cap is not None:
             self._cap.release()
             self._cap = None
+
+    def close_all_windows(self):
+        cv.destroyAllWindows()
 

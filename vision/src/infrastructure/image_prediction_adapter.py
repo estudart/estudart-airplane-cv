@@ -14,8 +14,9 @@ class ImagePredictorAdapter:
         self._height = height
         self._object_counter = solutions.ObjectCounter(
             show=True,
-            region=[(0, 720), (1280, 720), (1280, 0), (0, 0)],
+            region=[(600, 100), (600, 600)],
             model=self._model,
+            classes=[4],
         )
 
     def count_objects(self, frame):
