@@ -11,6 +11,10 @@ def test_can_count_object():
     
     while camera_adapter._cap.isOpened():
         success, im0 = camera_adapter._cap.read()
+
+        if not success:
+            break
+
         results = image_predictor._object_counter(im0)
         video_writer.write(results.plot_im)
 
