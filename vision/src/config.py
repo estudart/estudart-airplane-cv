@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     CAMERA_HEIGHT: int = 720
     CAMERA_FPS: int = 15
     MODEL_NAME: str = "yolo26n.pt"
+    COUNT_CLASSES: list = [4]
 
 
 settings = Settings()

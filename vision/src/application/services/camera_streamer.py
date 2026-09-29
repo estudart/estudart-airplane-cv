@@ -26,6 +26,8 @@ class CameraStreamer:
         self._last_result = None
         self._count_frame = 0
         self._should_predict = should_predict
+        self._last_in_count = 0
+        self._last_out_count = 0
 
     async def connect_stream(self):
         await self._web_socket_adapter.connect()
@@ -47,6 +49,15 @@ class CameraStreamer:
                 )
 
                 frame = self._last_result.plot_im
+                in_count = self._last_result.in_count
+                out_count = self._last_result.out_count
+
+                if (
+                    (in_count > self._last_in_count) or
+                    (out_count > self._last_out_count)
+                ):
+                    # save the frame
+                    pass
 
                 await self._redis_adapter.set_key(
                     key=settings.CAMERA_FRAME_KEY,

@@ -47,7 +47,8 @@ def get_image_predictor_adapter() -> ImagePredictorAdapter:
     global _image_predictor_adapter
     if not _image_predictor_adapter:
         _image_predictor_adapter = ImagePredictorAdapter(
-            model_name=settings.MODEL_NAME
+            model_name=settings.MODEL_NAME,
+            classes=settings.COUNT_CLASSES
         )
     return _image_predictor_adapter
 
@@ -62,6 +63,7 @@ def get_camera_streamer() -> CameraStreamer:
             web_socket_adapter=get_web_socket_adapter(),
             image_predictor_adapter=get_image_predictor_adapter(),
             should_predict=settings.SHOULD_PREDICT,
+            
         )
     return _camera_streamer
 
