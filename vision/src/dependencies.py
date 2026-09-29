@@ -1,5 +1,6 @@
 import logging
 
+from src.infrastructure.database.database import Database
 from src.application.services.camera_streamer import CameraStreamer
 from src.application.services.logging_service import LoggerService
 from src.config import settings
@@ -9,6 +10,7 @@ from src.infrastructure.redis_adapter import RedisAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
 
 
+_database: Database | None = None
 _camera_adapter: CameraAdapter | None = None
 _web_socket_adapter: WebSocketAdapter | None = None
 _camera_streamer: CameraStreamer | None = None
@@ -16,6 +18,12 @@ _image_predictor_adapter: ImagePredictorAdapter | None = None
 _logger_service: LoggerService | None = None
 _redis_adapter: RedisAdapter | None = None
 
+
+def get_database() -> Database:
+    global _database
+    if not _database:
+        _database = Database(settings.DATABASE_URL)
+    return _database
 
 def get_logger_service() -> LoggerService:
     global _logger_service
@@ -63,7 +71,7 @@ def get_camera_streamer() -> CameraStreamer:
             web_socket_adapter=get_web_socket_adapter(),
             image_predictor_adapter=get_image_predictor_adapter(),
             should_predict=settings.SHOULD_PREDICT,
-            
+
         )
     return _camera_streamer
 
