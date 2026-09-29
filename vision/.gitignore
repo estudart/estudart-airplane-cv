@@ -11,3 +11,5 @@ __pycache__/
 *.onnx
 *.engine
 models/
+airplane-right-to-left-fixed-camera.mp4
+object_counting_output.avi

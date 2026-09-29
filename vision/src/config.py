@@ -13,8 +13,7 @@ class Settings(BaseSettings):
     CAMERA_WIDTH: int = 1280
     CAMERA_HEIGHT: int = 720
     CAMERA_FPS: int = 15
-    MODEL_NAME: str = "yolo11n.pt"
-    PREDICTION_EVERY_N_FRAMES: int = 5
+    MODEL_NAME: str = "yolo26n.pt"
 
 
 settings = Settings()
