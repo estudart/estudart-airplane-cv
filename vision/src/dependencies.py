@@ -31,7 +31,6 @@ def get_logger_service() -> LoggerService:
         _logger_service = LoggerService(level=logging.INFO)
     return _logger_service
 
-
 def get_camera_adapter() -> CameraAdapter:
     global _camera_adapter
     if not _camera_adapter:
@@ -43,13 +42,11 @@ def get_camera_adapter() -> CameraAdapter:
         )
     return _camera_adapter
 
-
 def get_web_socket_adapter() -> WebSocketAdapter:
     global _web_socket_adapter
     if not _web_socket_adapter:
         _web_socket_adapter = WebSocketAdapter(uri=settings.WS_SERVER_URL)
     return _web_socket_adapter
-
 
 def get_image_predictor_adapter() -> ImagePredictorAdapter:
     global _image_predictor_adapter
@@ -59,7 +56,6 @@ def get_image_predictor_adapter() -> ImagePredictorAdapter:
             classes=settings.COUNT_CLASSES
         )
     return _image_predictor_adapter
-
 
 def get_camera_streamer() -> CameraStreamer:
     global _camera_streamer
@@ -74,7 +70,6 @@ def get_camera_streamer() -> CameraStreamer:
 
         )
     return _camera_streamer
-
 
 def get_redis_adapter() -> RedisAdapter:
     global _redis_adapter
