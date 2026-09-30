@@ -17,12 +17,18 @@ class DetectionRepository:
     def to_domain(self):
         pass
 
-    def get_all(self):
-        with self._db.session() as session:
-            results = s.execute(select(Detection)).all()
-        return results
+    def get_all(self) -> Detection | None:
+        try:
+            with self._db.session() as session:
+                results = session.execute(select(Detection)).all()
+            return results
+        except Exception as err:
+            self._logger_service.log_error_message(
+                f"Could not get detection, reason: {err}"
+            )
+            return None
 
-    def get_by_id(self, detection_id: int) -> Detection:
+    def get_by_id(self, detection_id: int) -> Detection | None:
         try:
             with self._db.session() as session:
                 statement = (
