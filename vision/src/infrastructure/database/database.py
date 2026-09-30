@@ -1,6 +1,8 @@
+from typing import Iterator
+
 from sqlalchemy import Connection, create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
-
+from contextlib import contextmanager
 
 
 class Base(DeclarativeBase):

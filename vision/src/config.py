@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     CAMERA_FPS: int = 15
     MODEL_NAME: str = "yolo26n.pt"
     COUNT_CLASSES: list = [4]
-    DATABASE_URL: str
+    # DATABASE_URL: str
 
 
 settings = Settings()
