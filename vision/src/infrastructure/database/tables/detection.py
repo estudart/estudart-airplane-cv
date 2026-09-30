@@ -5,7 +5,7 @@ from src.infrastructure.database.database import Base
 
 
 
-class DetectionTable(Base):
+class Detection(Base):
     __tablename__ = "detections"
 
     id: Mapped[int] = mapped_column(
