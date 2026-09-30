@@ -37,8 +37,6 @@ class DetectionRepository:
             )
             return None
 
-
-
     def create(
         self,
         detected_object: str,
