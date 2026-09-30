@@ -1,3 +1,5 @@
+from sqlalchemy import select
+
 from src.infrastructure.database.database import Database
 from src.infrastructure.database.tables.detection import Detection
 from src.application.services.logging_service import LoggerService
@@ -20,11 +22,28 @@ class DetectionRepository:
             results = s.execute(select(Detection)).all()
         return results
 
+    def get_by_id(self, detection_id: int) -> Detection:
+        try:
+            with self._db.session() as session:
+                statement = (
+                    select(Detection)
+                    .where(Detection.id == detection_id)
+                )
+                result = session.scalars(statement).one()
+            return result
+        except Exception as err:
+            self._logger_service.log_error_message(
+                f"Could not get detection, reason: {err}"
+            )
+            return None
+
+
+
     def create(
         self,
         detected_object: str,
         confidence: float
-    ) -> bool:
+    ) -> Detection:
         try:
             new_detection = Detection(
                 detected_object=detected_object,
@@ -32,12 +51,12 @@ class DetectionRepository:
             )
             with self._db.session() as session:
                 session.add(new_detection)
-            return True
+            return new_detection
         except Exception as err:
             self._logger_service.log_error_message(
                 f"Could not add new detection, reason: {err}"
             )
-            return False
+            return None
 
     def update(self):
         pass
