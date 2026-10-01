@@ -22,6 +22,10 @@ class Detection(Base):
         Float,
         nullable=False,
     )
+    storage_path: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

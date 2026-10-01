@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 
 from src.infrastructure.database.database import Database
@@ -49,9 +51,15 @@ class DetectionRepository:
         confidence: float
     ) -> Detection:
         try:
+            current_date = datetime.now()
             new_detection = Detection(
                 detected_object=detected_object,
-                confidence=confidence
+                confidence=confidence,
+                storage_path=(
+                    f"detection/frames/{detected_object}/"
+                    f"{current_date.day}-{current_date.month}-{current_date.year}/"
+                    f"{current_date.hour}-{current_date.minute}-{current_date.second}"
+                )
             )
             with self._db.session() as session:
                 session.add(new_detection)
