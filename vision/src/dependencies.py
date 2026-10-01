@@ -67,6 +67,7 @@ def get_camera_streamer() -> CameraStreamer:
             camera_adapter=get_camera_adapter(),
             web_socket_adapter=get_web_socket_adapter(),
             image_predictor_adapter=get_image_predictor_adapter(),
+            detection_repository=get_detection_repository(),
             should_predict=settings.SHOULD_PREDICT,
 
         )
