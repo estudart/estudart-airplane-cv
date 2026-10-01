@@ -8,7 +8,7 @@ from src.infrastructure.camera_adapter import CameraAdapter
 from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
 from src.infrastructure.redis_adapter import RedisAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
-
+from src.infrastructure.database.repositories.detection_repository import DetectionRepository
 
 _database: Database | None = None
 _camera_adapter: CameraAdapter | None = None
@@ -17,6 +17,7 @@ _camera_streamer: CameraStreamer | None = None
 _image_predictor_adapter: ImagePredictorAdapter | None = None
 _logger_service: LoggerService | None = None
 _redis_adapter: RedisAdapter | None = None
+_detection_repository: DetectionRepository | None = None
 
 
 def get_database() -> Database:
@@ -77,3 +78,11 @@ def get_redis_adapter() -> RedisAdapter:
         _redis_adapter = RedisAdapter(logger_service=get_logger_service())
     return _redis_adapter
 
+def get_detection_repository() -> DetectionRepository:
+    global _detection_repository
+    if not _detection_repository:
+        _detection_repository = DetectionRepository(
+            db=get_database(),
+            logger_service=get_logger_service()
+        )
+    return _detection_repository
