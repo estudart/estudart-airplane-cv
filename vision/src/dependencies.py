@@ -71,8 +71,8 @@ def get_camera_streamer() -> CameraStreamer:
             web_socket_adapter=get_web_socket_adapter(),
             image_predictor_adapter=get_image_predictor_adapter(),
             detection_repository=get_detection_repository(),
+            gcs_adapter=get_google_cloud_storage_adapter(),
             should_predict=settings.SHOULD_PREDICT,
-
         )
     return _camera_streamer
 
