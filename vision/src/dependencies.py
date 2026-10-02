@@ -9,6 +9,7 @@ from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
 from src.infrastructure.redis_adapter import RedisAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
 from src.infrastructure.database.repositories.detection_repository import DetectionRepository
+from src.infrastructure.gcs_adapter import GoogleCloudStorageAdapter
 
 _database: Database | None = None
 _camera_adapter: CameraAdapter | None = None
@@ -18,6 +19,8 @@ _image_predictor_adapter: ImagePredictorAdapter | None = None
 _logger_service: LoggerService | None = None
 _redis_adapter: RedisAdapter | None = None
 _detection_repository: DetectionRepository | None = None
+_google_cloud_storage_adapter: GoogleCloudStorageAdapter | None = None
+
 
 
 def get_database() -> Database:
@@ -87,3 +90,9 @@ def get_detection_repository() -> DetectionRepository:
             logger_service=get_logger_service()
         )
     return _detection_repository
+
+def get_google_cloud_storage_adapter() -> GoogleCloudStorageAdapter:
+    global _google_cloud_storage_adapter
+    if not _google_cloud_storage_adapter:
+        _google_cloud_storage_adapter = GoogleCloudStorageAdapter()
+    return _google_cloud_storage_adapter
