@@ -11,9 +11,14 @@ from src.config import settings
 
 @asynccontextmanager
 async def app_lifespan(_app: FastAPI):
+    database = get_database()
     print("Starting up the app...")
-    yield
-    print("Shutting down the app...")
+    database._create_all()
+    try:
+        yield
+    finally:
+        print("Shutting down the app...")
+        database.dispose()
 
 mcp_app = mcp.http_app()
 

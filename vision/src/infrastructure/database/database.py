@@ -20,7 +20,6 @@ class Database:
             bind=self._engine,
             expire_on_commit=False
         )
-        self._create_all()
 
     def _create_all(self) -> None:
         Base.metadata.create_all(self._engine)

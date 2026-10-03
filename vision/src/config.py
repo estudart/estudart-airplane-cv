@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     MODEL_NAME: str = "yolo26n.pt"
     COUNT_CLASSES: list = [0]
     BUCKET_NAME: str = "estudart-airplane-cv"
-    DATABASE_URL: str = "sqlite:///airplane-cv.db"
+    DATABASE_URL: str = "postgresql+psycopg://airplane:airplane@localhost:5432/airplane_cv"
 
 
 settings = Settings()

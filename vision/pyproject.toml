@@ -10,6 +10,7 @@ dependencies = [
     "google-cloud-storage>=3.16.0",
     "lap>=0.5.13",
     "opencv-python-headless>=4.10.0",
+    "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.10.0",
     "redis>=6.0.0",
     "shapely>=2.1.2",
