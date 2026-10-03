@@ -46,10 +46,10 @@ class CameraStreamer:
 
         while True:
             try:
-                frame = self._camera_adapter.get_frame()
+                raw_frame = self._camera_adapter.get_frame()
 
                 self._last_result, counted_objects = self._image_predictor_adapter.count_objects(
-                    frame=frame
+                    frame=raw_frame
                 )
 
                 frame = self._last_result.plot_im
@@ -61,7 +61,7 @@ class CameraStreamer:
                     )
 
                     self._gcs_adapter.upload_file(
-                        file_content=self._camera_adapter.from_frame_to_bytes(frame),
+                        file_content=self._camera_adapter.from_frame_to_bytes(raw_frame),
                         file_path=new_detection.storage_path
                     )
 
