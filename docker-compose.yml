@@ -17,6 +17,7 @@ services:
       retries: 5
       start_period: 10s
     environment:
+      - DATABASE_URL=postgresql+psycopg://airplane:airplane@postgres-db:5432/airplane_cv
       - REDIS_HOST=redis-db
       - REDIS_PORT=6379
     depends_on:
@@ -96,7 +97,26 @@ services:
       timeout: 3s
       retries: 10
 
+  postgres-db:
+    image: postgres:17-alpine
+    container_name: airplane-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: airplane_cv
+      POSTGRES_USER: airplane
+      POSTGRES_PASSWORD: airplane
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airplane -d airplane_cv"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
+  postgres-data:
   redis-data:
     driver: local
 

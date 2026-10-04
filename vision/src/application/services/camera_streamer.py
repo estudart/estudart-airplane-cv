@@ -6,6 +6,8 @@ from src.infrastructure.camera_adapter import CameraAdapter
 from src.infrastructure.image_prediction_adapter import ImagePredictorAdapter
 from src.infrastructure.redis_adapter import RedisAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
+from src.infrastructure.database.repositories.detection_repository import DetectionRepository
+from src.infrastructure.gcs_adapter import GoogleCloudStorageAdapter
 
 
 class CameraStreamer:
@@ -16,6 +18,8 @@ class CameraStreamer:
         camera_adapter: CameraAdapter,
         web_socket_adapter: WebSocketAdapter,
         image_predictor_adapter: ImagePredictorAdapter,
+        detection_repository: DetectionRepository,
+        gcs_adapter: GoogleCloudStorageAdapter,
         should_predict: bool,
     ) -> None:
         self._logger_service = logger_service
@@ -23,6 +27,8 @@ class CameraStreamer:
         self._camera_adapter = camera_adapter
         self._web_socket_adapter = web_socket_adapter
         self._image_predictor_adapter = image_predictor_adapter
+        self._gcs_adapter = gcs_adapter
+        self._detection_repository = detection_repository
         self._last_result = None
         self._count_frame = 0
         self._should_predict = should_predict
@@ -40,13 +46,24 @@ class CameraStreamer:
 
         while True:
             try:
-                frame = self._camera_adapter.get_frame()
+                raw_frame = self._camera_adapter.get_frame()
 
-                self._last_result = self._image_predictor_adapter.count_objects(
-                    frame=frame
+                self._last_result, counted_objects = self._image_predictor_adapter.count_objects(
+                    frame=raw_frame
                 )
 
                 frame = self._last_result.plot_im
+
+                for counted_object in counted_objects:
+                    new_detection = self._detection_repository.create(
+                        detected_object=counted_object.detected_object,
+                        confidence=counted_object.confidence
+                    )
+
+                    self._gcs_adapter.upload_file(
+                        file_content=self._camera_adapter.from_frame_to_bytes(raw_frame),
+                        file_path=new_detection.storage_path
+                    )
 
                 await self._redis_adapter.set_key(
                     key=settings.CAMERA_FRAME_KEY,
