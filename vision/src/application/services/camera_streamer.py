@@ -40,7 +40,6 @@ class CameraStreamer:
     async def stream_frame(self):
         await self.connect_stream()
         await self._redis_adapter._create_connection()
-        # frame_delay = 1 / max(settings.CAMERA_FPS, 1)
 
         self._logger_service.log_info_message("Starting camera streaming...")
 
@@ -74,7 +73,7 @@ class CameraStreamer:
                     msg_type="camera-frame",
                     message=self._camera_adapter.from_frame_to_b64(frame),
                 )
-                # await asyncio.sleep(frame_delay)
+
             except Exception as err:
                 self._logger_service.log_error_message(
                     f"Could not stream frame, reason: {err}"
