@@ -1,4 +1,5 @@
 import asyncio
+import threading
 
 from src.application.services.logging_service import LoggerService
 from src.config import settings
@@ -37,6 +38,17 @@ class CameraStreamer:
         await self._web_socket_adapter.connect()
         self._logger_service.log_info_message("Connection established")
 
+    def persist_detection(self, counted_object, raw_frame):
+        new_detection = self._detection_repository.create(
+            detected_object=counted_object.detected_object,
+            confidence=counted_object.confidence
+        )
+
+        self._gcs_adapter.upload_file(
+            file_content=self._camera_adapter.from_frame_to_bytes(raw_frame),
+            file_path=new_detection.storage_path
+        )
+
     async def stream_frame(self):
         await self.connect_stream()
         await self._redis_adapter._create_connection()
@@ -54,15 +66,11 @@ class CameraStreamer:
                 frame = self._last_result.plot_im
 
                 for counted_object in counted_objects:
-                    new_detection = self._detection_repository.create(
-                        detected_object=counted_object.detected_object,
-                        confidence=counted_object.confidence
+                    persist_thread = threading.Thread(
+                        target=self.persist_detection,
+                        args=(counted_object, raw_frame),
                     )
-
-                    self._gcs_adapter.upload_file(
-                        file_content=self._camera_adapter.from_frame_to_bytes(raw_frame),
-                        file_path=new_detection.storage_path
-                    )
+                    persist_thread.start()
 
                 await self._redis_adapter.set_key(
                     key=settings.CAMERA_FRAME_KEY,
