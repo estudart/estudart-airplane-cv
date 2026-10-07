@@ -1,12 +1,14 @@
 
 
-export default function DetectionGalleryCard() {
-    const detectionClusters = ['airplane', 'helicopter', 'bird'];
+interface Props {
+    cluster: string
+}
+
+export default function DetectionGalleryCard({ cluster }: Props) {
+
     return (
         <main>
-            {detectionClusters.map(cluster => 
-                <div>{cluster}</div>
-            )}
+            <div>{cluster}</div>
         </main>
     )
 }
