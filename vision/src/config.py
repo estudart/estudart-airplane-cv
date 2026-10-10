@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     CAMERA_HEIGHT: int = 720
     CAMERA_FPS: int = 15
     MODEL_NAME: str = "yolo26n.pt"
-    COUNT_CLASSES: list = [0]
+    COUNT_CLASSES: list = [4]
     BUCKET_NAME: str = "estudart-airplane-cv"
     DATABASE_URL: str = "postgresql+psycopg://airplane:airplane@localhost:5432/airplane_cv"
 
