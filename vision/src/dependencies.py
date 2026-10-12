@@ -10,6 +10,7 @@ from src.infrastructure.redis_adapter import RedisAdapter
 from src.infrastructure.web_socket_adapter import WebSocketAdapter
 from src.infrastructure.database.repositories.detection_repository import DetectionRepository
 from src.infrastructure.gcs_adapter import GoogleCloudStorageAdapter
+from src.application.services.file_manager_service import FileManagerService
 
 _database: Database | None = None
 _camera_adapter: CameraAdapter | None = None
@@ -20,6 +21,7 @@ _logger_service: LoggerService | None = None
 _redis_adapter: RedisAdapter | None = None
 _detection_repository: DetectionRepository | None = None
 _google_cloud_storage_adapter: GoogleCloudStorageAdapter | None = None
+_file_manager_service: FileManagerService | None = None
 
 
 
@@ -98,3 +100,12 @@ def get_google_cloud_storage_adapter() -> GoogleCloudStorageAdapter:
             bucket_name=settings.BUCKET_NAME
         )
     return _google_cloud_storage_adapter
+
+def get_file_manager_service() -> FileManagerService:
+    global _file_manager_service
+    if not _file_manager_service:
+        _file_manager_service = FileManagerService(
+            blob_storage_adapter=get_google_cloud_storage_adapter(),
+            logger_service=get_logger_service()
+        )
+    return _file_manager_service
