@@ -5,7 +5,7 @@ from src.dependencies import get_file_manager_service
 file_manager_router = APIRouter(prefix="api/file_manager", tags=["File Manager"])
 
 
-@file_manager_router.get("/get-file")
+@file_manager_router.get("api/get-file")
 async def get_file(file_path: str):
     try:
         service = get_file_manager_service()
