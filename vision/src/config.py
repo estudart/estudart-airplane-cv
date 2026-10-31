@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    WS_SERVER_URL: str = "ws://localhost:8080"
+    WS_SERVER_URL: str = "ws://localhost:8000/ws"
     SHOULD_PREDICT: bool = True
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     COUNT_CLASSES: list = [4]
     BUCKET_NAME: str = "estudart-airplane-cv"
     DATABASE_URL: str = "postgresql+psycopg://airplane:airplane@localhost:5432/airplane_cv"
+    OPENAI_API_KEY: str = ""
+    MODEL: str = "gpt-4o-mini"
+    CAMERA_AGENT_TOOLS: list = ["capture_image", "get_latest_frame_info", "mcp_status"]
 
 
 settings = Settings()

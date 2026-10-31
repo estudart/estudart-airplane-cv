@@ -1,9 +1,9 @@
 services:
-  mcp-server:
+  vision:
     build:
       context: ./vision
       dockerfile: src/application/servers/mcp_server/Dockerfile
-    container_name: airplane-mcp-server
+    container_name: airplane-vision
     restart: unless-stopped
     env_file:
       - path: ./vision/.env
@@ -23,29 +23,7 @@ services:
     depends_on:
       redis-db:
         condition: service_healthy
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: airplane-backend
-    restart: unless-stopped
-    env_file:
-      - path: ./backend/.env
-        required: false
-    ports:
-      - "8080:8080"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-    environment:
-      - API_PORT=8080
-      - MCP_SERVER_URL=http://mcp-server:8000
-    depends_on:
-      mcp-server:
+      postgres-db:
         condition: service_healthy
 
   camera-streamer:
@@ -59,12 +37,12 @@ services:
       - path: ./vision/.env
         required: false
     environment:
-      - WS_SERVER_URL=ws://backend:8080
+      - WS_SERVER_URL=ws://vision:8000/ws
       - SHOULD_PREDICT=true
       - REDIS_HOST=redis-db
       - REDIS_PORT=6379
     depends_on:
-      backend:
+      vision:
         condition: service_healthy
       redis-db:
         condition: service_healthy
@@ -74,13 +52,13 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-ws://localhost:8080}
+        VITE_VISION_URL: ${VITE_VISION_URL:-ws://localhost:8000/ws}
     container_name: airplane-frontend
     restart: unless-stopped
     ports:
       - "5173:80"
     depends_on:
-      backend:
+      vision:
         condition: service_healthy
 
   redis-db:
@@ -119,4 +97,3 @@ volumes:
   postgres-data:
   redis-data:
     driver: local
-

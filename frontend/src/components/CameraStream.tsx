@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 
 import { useWebSocket } from "../hooks/webSocketHook";
+import { CAMERA_CONSUMER_URL } from "../services/vision-socket";
 import styles from "./CameraStream.module.css";
 
 
 export function CameraStream() {
     const [frame, setFrame] = useState("");
     const [status, setStatus] = useState("connecting");
-    const websocketUrl = import.meta.env.VITE_BACKEND_URL ?? "ws://localhost:8080";
 
     const handleMessage = useCallback((data: Record<string, unknown>) => {
         if (data.type === "camera-frame" && typeof data.frame === "string") {
@@ -19,7 +19,7 @@ export function CameraStream() {
     const handleClose = useCallback(() => setStatus("reconnecting"), []);
 
     useWebSocket(
-        `${websocketUrl}?subscribeType=camera-data-consumer&detected=true`,
+        CAMERA_CONSUMER_URL,
         {
             onMessage: handleMessage,
             onOpen: handleOpen,

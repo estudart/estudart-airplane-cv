@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useWebSocket } from "../hooks/webSocketHook";
 import ChatMessages from "./ChatMessages";
 import { speakResponse } from "../services/speech-synthesis";
+import { VISION_SOCKET_URL } from "../services/vision-socket";
 import styles from "./CameraChat.module.css"
 
 export function CameraChat() {
@@ -47,7 +48,7 @@ export function CameraChat() {
     );
 
     const { send } = useWebSocket(
-        import.meta.env.VITE_BACKEND_URL ?? "ws://localhost:8080",
+        VISION_SOCKET_URL,
         {
             onMessage: handleReceiveMessage,
             onClose: undefined,
