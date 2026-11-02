@@ -105,16 +105,17 @@ make dev-reload
 
 - `vision` runs under `uvicorn --reload --reload-dir src`, so a Python save restarts the server.
 - `frontend` runs under the vite dev server on <http://localhost:5173>, so a React save hot-reloads the page.
+- `camera-streamer` runs natively, so it keeps host webcam permission.
 
-`Ctrl+C` stops both and the two containers. `make dev-api` and `make dev-web` run one side alone, and `VISION_PORT`, `FRONTEND_PORT`, and `VISION_URL` override the defaults.
+`Ctrl+C` stops all three and the two containers. `make dev-api`, `make dev-web`, and `make dev-camera` run one side alone, and `VISION_PORT`, `FRONTEND_PORT`, and `VISION_URL` override the defaults.
 
-The camera is a third process, because it needs host webcam permission:
+A `--reload` restart drops the streamer's WebSocket and it does not reconnect on its own, so restart `make dev-camera` after a backend save if the frames stop.
+
+If a start fails with `Address already in use` or `Port 5173 is already in use`, an earlier run is still holding them:
 
 ```bash
-make camera-mac
+lsof -nP -iTCP:8000 -iTCP:5173 -sTCP:LISTEN
 ```
-
-A `--reload` restart drops the streamer's WebSocket and it does not reconnect on its own, so restart `make camera-mac` after a backend save if the frames stop.
 
 ## Two-terminal debugging
 

@@ -9,7 +9,14 @@ FRONTEND_PORT ?= 5173
 VISION_URL ?= ws://localhost:$(VISION_PORT)/ws
 LOCAL_DATABASE_URL := postgresql+psycopg://airplane:airplane@localhost:5432/airplane_cv
 
-.PHONY: up dev dev-reload dev-api dev-web up-hardware camera-mac down logs check check-frontend check-python check-exclusions check-readme
+API_ENV := DATABASE_URL=$(LOCAL_DATABASE_URL) REDIS_HOST=localhost REDIS_PORT=6379
+CAMERA_ENV := WS_SERVER_URL=$(VISION_URL) REDIS_HOST=localhost REDIS_PORT=6379
+API_CMD := uv run uvicorn src.application.servers.mcp_server.rest_server:app \
+	--host 0.0.0.0 --port $(VISION_PORT) --reload --reload-dir src
+CAMERA_CMD := uv run python -m src.application.servers.camera_streamer.streamer
+WEB_CMD := $(NPM) --prefix frontend run dev -- --port $(FRONTEND_PORT) --strictPort
+
+.PHONY: up dev dev-reload dev-api dev-web dev-camera up-hardware camera-mac down logs check check-frontend check-python check-exclusions check-readme
 
 up:
 	@set -eu; \
@@ -34,42 +41,49 @@ dev: up
 
 # Everything you edit runs on the host: uvicorn reloads on a Python save,
 # vite hot-reloads on a React save. Only Redis and Postgres stay in Docker.
+# Each process is started with exec, so the pid held here is the real server
+# and the cleanup below actually stops it.
 dev-reload:
 	@set -eu; \
-	api_pid=""; web_pid=""; \
+	api_pid=""; web_pid=""; camera_pid=""; \
 	cleanup() { \
 		trap - EXIT INT TERM; \
-		if [ -n "$$api_pid" ]; then kill "$$api_pid" 2>/dev/null || true; fi; \
-		if [ -n "$$web_pid" ]; then kill "$$web_pid" 2>/dev/null || true; fi; \
-		wait "$$api_pid" 2>/dev/null || true; \
-		wait "$$web_pid" 2>/dev/null || true; \
+		for pid in "$$api_pid" "$$web_pid" "$$camera_pid"; do \
+			if [ -n "$$pid" ]; then kill "$$pid" 2>/dev/null || true; fi; \
+		done; \
+		for pid in "$$api_pid" "$$web_pid" "$$camera_pid"; do \
+			if [ -n "$$pid" ]; then wait "$$pid" 2>/dev/null || true; fi; \
+		done; \
 		$(COMPOSE) stop redis-db postgres-db; \
 	}; \
 	trap cleanup EXIT INT TERM; \
 	$(COMPOSE) up -d --wait --wait-timeout 60 redis-db postgres-db; \
-	$(MAKE) dev-api & \
+	(cd vision && uv sync --frozen); \
+	$(NPM) --prefix frontend install; \
+	(cd vision && exec env $(API_ENV) $(API_CMD)) & \
 	api_pid=$$!; \
-	$(MAKE) dev-web & \
+	(exec env VITE_VISION_URL=$(VISION_URL) $(WEB_CMD)) & \
 	web_pid=$$!; \
+	(cd vision && exec env $(CAMERA_ENV) $(CAMERA_CMD)) & \
+	camera_pid=$$!; \
 	wait
 
 dev-api:
 	cd vision && uv sync --frozen
-	cd vision && env DATABASE_URL=$(LOCAL_DATABASE_URL) REDIS_HOST=localhost REDIS_PORT=6379 \
-		uv run uvicorn src.application.servers.mcp_server.rest_server:app \
-		--host 0.0.0.0 --port $(VISION_PORT) --reload --reload-dir src
+	cd vision && env $(API_ENV) $(API_CMD)
 
 dev-web:
 	$(NPM) --prefix frontend install
-	env VITE_VISION_URL=$(VISION_URL) $(NPM) --prefix frontend run dev -- \
-		--port $(FRONTEND_PORT) --strictPort
+	env VITE_VISION_URL=$(VISION_URL) $(WEB_CMD)
+
+dev-camera:
+	cd vision && uv sync --frozen
+	cd vision && env $(CAMERA_ENV) $(CAMERA_CMD)
 
 up-hardware:
 	docker compose -f docker-compose.yml -f docker-compose.hardware.yml --profile linux-camera up --build
 
-camera-mac:
-	cd vision && uv sync --frozen
-	cd vision && WS_SERVER_URL=ws://localhost:8000/ws REDIS_HOST=localhost REDIS_PORT=6379 uv run python -m src.application.servers.camera_streamer.streamer
+camera-mac: dev-camera
 
 down:
 	$(COMPOSE) down
