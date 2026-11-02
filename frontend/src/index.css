@@ -1,3 +1,46 @@
+/* ============================================================================
+   Three rules the whole app follows:
+
+   1. Parents decide layout, children fill what they are given.
+      A component never sets its own width.
+   2. Colour, spacing and size come from the tokens below — never a raw value.
+   3. Only `.main` (Layout.module.css) scrolls. Anything that should shrink
+      instead of overflow gets `min-height: 0`.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- 1. Reset */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box; /* padding and border count INSIDE width/height */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* --------------------------------------------------------------- 2. Tokens */
+
 :root {
   /* ---- surfaces ---- */
   --bg: #08090c;
@@ -20,6 +63,19 @@
   --accent-line: rgba(0, 240, 255, 0.38);
   --violet: #a855f7;
 
+  /* ---- spacing: the ONLY gap and padding values used in this app ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+
+  /* ---- layout sizes ---- */
+  --nav-height: 56px;
+  --control-height: 44px;
+  --workspace-max: 1500px; /* widest the camera + chat card ever gets */
+  --workspace-min: 520px;  /* shortest it gets before the page scrolls */
+
   /* ---- shape ---- */
   --radius: 10px;
   --radius-sm: 6px;
@@ -39,31 +95,40 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 15px;
-  }
 }
 
+/* ------------------------------------------------------------- 3. Elements */
+
 body {
-  margin: 0;
   background:
     radial-gradient(900px 500px at 50% -10%, rgba(0, 240, 255, 0.06), transparent 70%),
     var(--bg);
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: left;
-  border-inline: 1px solid var(--border-soft);
-  height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  overflow-y: auto;
-  background: linear-gradient(180deg, rgba(0, 240, 255, 0.03), transparent 220px);
+h1,
+h2 {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+p {
+  margin: 0;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  padding: 3px 7px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--surface-2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-line);
+  outline-offset: 2px;
 }
 
 /* ---- scrollbars ---- */
@@ -87,32 +152,6 @@ body {
 *::-webkit-scrollbar-thumb:hover {
   background: #2c3346;
   background-clip: content-box;
-}
-
-/* ---- focus ---- */
-:focus-visible {
-  outline: 2px solid var(--accent-line);
-  outline-offset: 2px;
-}
-
-h1,
-h2 {
-  font-family: var(--display);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-p {
-  margin: 0;
-}
-
-code {
-  font-family: var(--mono);
-  font-size: 0.9em;
-  padding: 3px 7px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--surface-2);
 }
 
 @media (prefers-reduced-motion: reduce) {

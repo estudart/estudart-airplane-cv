@@ -7,14 +7,12 @@ import { CameraView } from "./pages/CameraView/CameraView";
 
 export default function App() {
     return (
-        <div>
-            <Routes>
-                <Route path="/" element={<Navigate to="/camera-view" replace />} />
-                <Route element={<Layout />}>
+        <Routes>
+            <Route path="/" element={<Navigate to="/camera-view" replace />} />
+            <Route element={<Layout />}>
                 <Route path="/camera-view" element={<CameraView />} />
-                </Route>
-            </Routes>
-        </div>
+            </Route>
+        </Routes>
     )
 
 };

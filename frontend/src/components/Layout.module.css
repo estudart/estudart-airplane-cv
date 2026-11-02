@@ -1,0 +1,13 @@
+/* The app shell: a fixed navbar row and a content row that fills the rest.
+   `.main` is the ONLY element in the app that scrolls. */
+
+.shell {
+  height: 100%;
+  display: grid;
+  grid-template-rows: var(--nav-height) 1fr;
+}
+
+.main {
+  min-height: 0; /* lets this row shrink so its own scrollbar is used */
+  overflow-y: auto;
+}

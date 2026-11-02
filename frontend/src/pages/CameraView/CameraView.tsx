@@ -6,11 +6,11 @@ import styles from "./CameraView.module.css";
 
 export function CameraView() {
     return (
-        <main className={styles.page}>
-            <CameraStream />
-            <CameraChat />
-        </main>
+        <div className={styles.page}>
+            <section className={styles.workspace}>
+                <CameraStream />
+                <CameraChat />
+            </section>
+        </div>
     );
 }
-
-
