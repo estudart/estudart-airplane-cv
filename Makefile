@@ -4,7 +4,12 @@ NPM := PATH="$(NODE_DIR):$$PATH" "$(NODE_DIR)npm"
 
 COMPOSE := docker compose -f docker-compose.yml
 
-.PHONY: up dev up-hardware camera-mac down logs check check-frontend check-python check-exclusions check-readme
+VISION_PORT ?= 8000
+FRONTEND_PORT ?= 5173
+VISION_URL ?= ws://localhost:$(VISION_PORT)/ws
+LOCAL_DATABASE_URL := postgresql+psycopg://airplane:airplane@localhost:5432/airplane_cv
+
+.PHONY: up dev dev-reload dev-api dev-web up-hardware camera-mac down logs check check-frontend check-python check-exclusions check-readme
 
 up:
 	@set -eu; \
@@ -26,6 +31,38 @@ up:
 	wait "$$camera_pid"
 
 dev: up
+
+# Everything you edit runs on the host: uvicorn reloads on a Python save,
+# vite hot-reloads on a React save. Only Redis and Postgres stay in Docker.
+dev-reload:
+	@set -eu; \
+	api_pid=""; web_pid=""; \
+	cleanup() { \
+		trap - EXIT INT TERM; \
+		if [ -n "$$api_pid" ]; then kill "$$api_pid" 2>/dev/null || true; fi; \
+		if [ -n "$$web_pid" ]; then kill "$$web_pid" 2>/dev/null || true; fi; \
+		wait "$$api_pid" 2>/dev/null || true; \
+		wait "$$web_pid" 2>/dev/null || true; \
+		$(COMPOSE) stop redis-db postgres-db; \
+	}; \
+	trap cleanup EXIT INT TERM; \
+	$(COMPOSE) up -d --wait --wait-timeout 60 redis-db postgres-db; \
+	$(MAKE) dev-api & \
+	api_pid=$$!; \
+	$(MAKE) dev-web & \
+	web_pid=$$!; \
+	wait
+
+dev-api:
+	cd vision && uv sync --frozen
+	cd vision && env DATABASE_URL=$(LOCAL_DATABASE_URL) REDIS_HOST=localhost REDIS_PORT=6379 \
+		uv run uvicorn src.application.servers.mcp_server.rest_server:app \
+		--host 0.0.0.0 --port $(VISION_PORT) --reload --reload-dir src
+
+dev-web:
+	$(NPM) --prefix frontend install
+	env VITE_VISION_URL=$(VISION_URL) $(NPM) --prefix frontend run dev -- \
+		--port $(FRONTEND_PORT) --strictPort
 
 up-hardware:
 	docker compose -f docker-compose.yml -f docker-compose.hardware.yml --profile linux-camera up --build

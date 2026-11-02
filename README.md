@@ -95,6 +95,29 @@ make up
 
 `make up` starts Compose in detached mode, runs the camera adapter natively with macOS camera permission through `uv run`, follows the container logs, and stops both lifecycles on `Ctrl+C`. `make dev` is an alias for the same flow.
 
+## Hot reload while you code
+
+`make dev-reload` runs the code you edit on the host and keeps only Redis and Postgres in Docker:
+
+```bash
+make dev-reload
+```
+
+- `vision` runs under `uvicorn --reload --reload-dir src`, so a Python save restarts the server.
+- `frontend` runs under the vite dev server on <http://localhost:5173>, so a React save hot-reloads the page.
+
+`Ctrl+C` stops both and the two containers. `make dev-api` and `make dev-web` run one side alone, and `VISION_PORT`, `FRONTEND_PORT`, and `VISION_URL` override the defaults.
+
+The camera is a third process, because it needs host webcam permission:
+
+```bash
+make camera-mac
+```
+
+A `--reload` restart drops the streamer's WebSocket and it does not reconnect on its own, so restart `make camera-mac` after a backend save if the frames stop.
+
+## Two-terminal debugging
+
 For two-terminal debugging, run the Docker core directly and the native camera separately:
 
 ```bash
