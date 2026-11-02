@@ -108,7 +108,8 @@ def get_google_cloud_storage_adapter() -> GoogleCloudStorageAdapter:
     global _google_cloud_storage_adapter
     if not _google_cloud_storage_adapter:
         _google_cloud_storage_adapter = GoogleCloudStorageAdapter(
-            bucket_name=settings.BUCKET_NAME
+            bucket_name=settings.BUCKET_NAME,
+            logger_service=get_logger_service()
         )
     return _google_cloud_storage_adapter
 
