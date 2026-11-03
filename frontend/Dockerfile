@@ -7,8 +7,8 @@ RUN npm install
 
 COPY . .
 
-ARG VITE_BACKEND_URL=ws://localhost:8080
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ARG VITE_VISION_URL=ws://localhost:8000/ws
+ENV VITE_VISION_URL=$VITE_VISION_URL
 
 RUN npm run build
 

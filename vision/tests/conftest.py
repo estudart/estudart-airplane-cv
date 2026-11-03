@@ -1,6 +1,7 @@
 import pytest
 
 from fakes.db import FakeDB
+from fakes.blob_storage import FakeBlobStorage
 
 @pytest.fixture
 def fake_db(tmp_path):
@@ -9,3 +10,7 @@ def fake_db(tmp_path):
     return FakeDB(
         url=f"sqlite:///{db_url}"
     )
+
+@pytest.fixture
+def fake_blob_storage():
+    return FakeBlobStorage()

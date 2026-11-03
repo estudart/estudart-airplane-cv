@@ -1,31 +1,51 @@
+/* The camera column. It sets no width — the workspace grid decides that. */
+
 .cameraStream {
-  width: 100%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-2);
 }
 
 .cameraView {
+  /* `flex: 1` makes the box fill the card's spare height; the frame is then
+     centred inside it with black bars, the way a video player behaves.
+     Swap it for `aspect-ratio: 16 / 9` if you prefer no bars and a shorter
+     card — that is exactly what the narrow-screen rule at the bottom does. */
+  flex: 1;
+  min-height: 0;
   display: grid;
-  min-height: min(58vh, 620px);
   place-items: center;
   overflow: hidden;
-  border: 1px solid #293238;
-  border-radius: 0.5rem;
   background: #000;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
 }
 
 .cameraFrame {
-  display: block;
+  /* fills the black box, keeps its own proportions, never crops or stretches */
   width: 100%;
-  height: auto;
+  height: 100%;
   object-fit: contain;
 }
 
 .status {
-  display: block;
-  margin-top: 0.5rem;
-  color: #8d9aa3;
+  flex: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   text-align: right;
+  color: var(--text-dim);
 }
 
+/* Stacked on narrow screens: let the box take the frame's own shape instead,
+   so a phone does not waste half its height on black bars. */
+@media (max-width: 900px) {
+  .cameraView {
+    flex: none;
+    aspect-ratio: 16 / 9;
+  }
+}
